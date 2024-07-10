@@ -2,22 +2,22 @@ version: "3.3"
 
 services:
   postgres:
-    container_name: postgres
+    container_name: postgresmine
     image: postgres:15.4
     command: postgres -c 'max_connections=500'
     environment:
-      POSTGRES_USER: ${POSTGRES_DB_USERNAME}
-      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
-      POSTGRES_PORT: ${POSTGRES_DB_PORT}
-    volumes:
-      - "./containers/postgres:/data/postgres"
-      # - ./bin/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      # POSTGRES_PORT: ${POSTGRES_DB_PORT}
+    # volumes:
+    # - "./containers/postgres:/data/postgres"
+    # - ./bin/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     ports:
-      - ${POSTGRES_DB_PORT}:5432
+      - 5433:5433
     restart: unless-stopped
-    networks:
-      you2sales_development_network:
-        ipv4_address: ${POSTGRES_IP}
+    # networks:
+    #   you2sales_development_network:
+    #     ipv4_address: ${POSTGRES_IP}
 
   # redis:
   #   image: "redis:latest"

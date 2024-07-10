@@ -1,19 +1,19 @@
-FROM node:16-alpine AS builder
 
-WORKDIR /usr/app
-ADD . /
+FROM ubuntu
 
-COPY .npmrc /app/src/app/.npmrc
-COPY .azure-access.key /root/.npmrc
+WORKDIR /var/www/socket
 
-RUN apk upgrade --update \
-  && apk add git \
-  && npm install -g npm@9.6.6 \
-  && apk add -U tzdata \
-  && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
-  && apk del tzdata \
-  && rm -rf /var/cache/apk/*
+# install node 20
 
-RUN npm i --quiet
+RUN apt update && apt upgrade
+RUN apt install -y curl
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+RUN apt install -y nodejs
 
-CMD npm run start
+# install curl + bun
+RUN apt update && apt upgrade
+RUN apt upgrade && apt install curl && apt install unzip
+RUN curl -fsSL https://bun.sh/install | bash
+RUN ~/.bun/bin/bun install uNetworking/uWebSockets.js#v20.33.0
+
+CMD ["node","src/index.js"]
