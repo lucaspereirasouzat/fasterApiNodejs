@@ -32,22 +32,16 @@ services:
       you2sales_development_network:
         ipv4_address: ${REDIS_IP}
 
-  microservice-attachments:
-    container_name: microservice-attachments
+  microservice:
+    container_name: microservice
     build:
-      context: ../attachments
+      context: .
       dockerfile: Dockerfile
-    command: npm run dev
+    command: npm run start
     cpus: 0.5
     mem_limit: 1g
     ports:
       - ${MICROSERVICE_ATTACHMENTS_PORT}:${MICROSERVICE_ATTACHMENTS_PORT}
       - ${MICROSERVICE_ATTACHMENTS_DEBBUGER_PORT}:9229
     volumes:
-      - ../attachments:/usr/app
-    links:
-      - microservice-keycloak
-      - microservice-subscription
-    networks:
-      you2sales_development_network:
-        ipv4_address: ${MICROSERVICE_ATTACHMENTS_IP}
+      - ./:/usr/app
