@@ -1,0 +1,53 @@
+version: "3.3"
+
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:15.4
+    command: postgres -c 'max_connections=500'
+    environment:
+      POSTGRES_USER: ${POSTGRES_DB_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+      POSTGRES_PORT: ${POSTGRES_DB_PORT}
+    volumes:
+      - "./containers/postgres:/data/postgres"
+      - ./bin/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+    ports:
+      - ${POSTGRES_DB_PORT}:5432
+    restart: unless-stopped
+    networks:
+      you2sales_development_network:
+        ipv4_address: ${POSTGRES_IP}
+
+  redis:
+    image: "redis:latest"
+    container_name: redis
+    volumes:
+      - "./containers/redis:/data"
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    expose:
+      - "${REDIS_PORT}"
+    networks:
+      you2sales_development_network:
+        ipv4_address: ${REDIS_IP}
+
+  microservice-attachments:
+    container_name: microservice-attachments
+    build:
+      context: ../attachments
+      dockerfile: Dockerfile
+    command: npm run dev
+    cpus: 0.5
+    mem_limit: 1g
+    ports:
+      - ${MICROSERVICE_ATTACHMENTS_PORT}:${MICROSERVICE_ATTACHMENTS_PORT}
+      - ${MICROSERVICE_ATTACHMENTS_DEBBUGER_PORT}:9229
+    volumes:
+      - ../attachments:/usr/app
+    links:
+      - microservice-keycloak
+      - microservice-subscription
+    networks:
+      you2sales_development_network:
+        ipv4_address: ${MICROSERVICE_ATTACHMENTS_IP}
