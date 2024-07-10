@@ -11,7 +11,7 @@ services:
       POSTGRES_PORT: ${POSTGRES_DB_PORT}
     volumes:
       - "./containers/postgres:/data/postgres"
-      - ./bin/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
+      # - ./bin/init-database.sh:/docker-entrypoint-initdb.d/init-database.sh
     ports:
       - ${POSTGRES_DB_PORT}:5432
     restart: unless-stopped
@@ -19,18 +19,18 @@ services:
       you2sales_development_network:
         ipv4_address: ${POSTGRES_IP}
 
-  redis:
-    image: "redis:latest"
-    container_name: redis
-    volumes:
-      - "./containers/redis:/data"
-    ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
-    expose:
-      - "${REDIS_PORT}"
-    networks:
-      you2sales_development_network:
-        ipv4_address: ${REDIS_IP}
+  # redis:
+  #   image: "redis:latest"
+  #   container_name: redis
+  #   volumes:
+  #     - "./containers/redis:/data"
+  #   ports:
+  #     - ${REDIS_PORT}:${REDIS_PORT}
+  #   expose:
+  #     - "${REDIS_PORT}"
+  #   networks:
+  #     you2sales_development_network:
+  #       ipv4_address: ${REDIS_IP}
 
   microservice:
     container_name: microservice
@@ -38,10 +38,9 @@ services:
       context: .
       dockerfile: Dockerfile
     command: npm run start
-    cpus: 0.5
-    mem_limit: 1g
+    # cpus: 0.5
+    # mem_limit: 1g
     ports:
-      - ${MICROSERVICE_ATTACHMENTS_PORT}:${MICROSERVICE_ATTACHMENTS_PORT}
-      - ${MICROSERVICE_ATTACHMENTS_DEBBUGER_PORT}:9229
+      - ${PORT}:${PORT}
     volumes:
       - ./:/usr/app
