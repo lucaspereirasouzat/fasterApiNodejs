@@ -1,19 +1,29 @@
-FROM node:16-alpine AS builder
+FROM ubuntu
 
-WORKDIR /usr/app
-ADD . /
+# Set timezone and environment variables
+ENV TZ=America/New_York
+ENV PATH=$PATH:/usr/bin/node
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-# COPY .npmrc /app/src/app/.npmrc
-# COPY .azure-access.key /root/.npmrc
+# Add source files to docker image
+ADD .	/home/websocket
 
-RUN apk upgrade --update \
-  && apk add git \
-  && npm install -g npm@9.6.6 \
-  && apk add -U tzdata \
-  && cp /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime \
-  && apk del tzdata \
-  && rm -rf /var/cache/apk/*
+# Update and install dependencies
+RUN apt-get -y update \
+  && apt-get -y upgrade \
+  && apt-get -y install curl git nodejs npm
 
-RUN npm i --quiet
+# Install yarn
+# RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+#   && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+#   && apt-get update && apt-get -y install yarn
 
+# Install node modules
+RUN cd /home/websocket \
+  && npm ci --quiet
+
+EXPOSE 3020
+
+WORKDIR /home/websocket
+# CMD ["node", "nodejs-uws_websocket-benchmark-server.js"]
 CMD npm run dev
